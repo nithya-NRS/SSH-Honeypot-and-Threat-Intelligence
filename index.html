@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SSH Honeypot SIEM Dashboard</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            <span>🛡️</span>
+            <div>
+                <h2>Honeypot SIEM</h2>
+                <small>Security Monitoring</small>
+            </div>
+        </div>
+
+        <nav>
+            <a class="active">📊 Dashboard</a>
+            <a>🚨 Security Events</a>
+            <a>🌐 Source IPs</a>
+            <a>💻 Command Activity</a>
+            <a>🎯 MITRE ATT&CK</a>
+            <a>⚙️ System</a>
+        </nav>
+
+        <div class="sidebar-status">
+            <span class="status-dot"></span>
+            <div>
+                <strong>System Online</strong>
+                <small>Cowrie Honeypot</small>
+            </div>
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+
+        <!-- HEADER -->
+        <header class="topbar">
+
+            <div>
+                <h1>SSH Honeypot SIEM Dashboard</h1>
+                <p>Real-Time Security Monitoring & Threat Intelligence</p>
+            </div>
+
+            <div class="top-right">
+                <span class="live">
+                    <span class="live-dot"></span>
+                    LIVE
+                </span>
+
+                <span id="currentTime">--:--:--</span>
+            </div>
+
+        </header>
+
+
+        <!-- ALERT BANNER -->
+        <section class="alert-banner">
+
+            <div class="alert-icon">⚠️</div>
+
+            <div>
+                <strong>Security Monitoring Active</strong>
+                <p>Cowrie SSH honeypot is monitoring suspicious SSH activity.</p>
+            </div>
+
+            <span class="alert-status">PROTECTED</span>
+
+        </section>
+
+
+        <!-- STAT CARDS -->
+        <section class="stats-grid">
+
+            <div class="stat-card">
+                <div class="stat-icon blue">📊</div>
+
+                <div>
+                    <p>Total Events</p>
+                    <h2 id="totalEvents">0</h2>
+                    <span class="positive">↑ 12.5%</span>
+                </div>
+            </div>
+
+
+            <div class="stat-card">
+                <div class="stat-icon red">🚨</div>
+
+                <div>
+                    <p>Suspicious Events</p>
+                    <h2 id="suspiciousEvents">0</h2>
+                    <span class="danger">↑ 8.3%</span>
+                </div>
+            </div>
+
+
+            <div class="stat-card">
+                <div class="stat-icon orange">🌐</div>
+
+                <div>
+                    <p>Source IPs</p>
+                    <h2 id="sourceIPs">0</h2>
+                    <span>Unique sources</span>
+                </div>
+            </div>
+
+
+            <div class="stat-card">
+                <div class="stat-icon purple">🔐</div>
+
+                <div>
+                    <p>SSH Sessions</p>
+                    <h2 id="sshSessions">0</h2>
+                    <span>Recorded sessions</span>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- CHART ROW -->
+        <section class="dashboard-grid">
+
+            <!-- ATTACK TIMELINE -->
+            <div class="panel large">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h3>📈 Attack Activity Timeline</h3>
+                        <span>SSH security events over time</span>
+                    </div>
+
+                    <button>Last 24 Hours ▾</button>
+
+                </div>
+
+                <canvas id="attackChart"></canvas>
+
+            </div>
+
+
+            <!-- EVENT TYPES -->
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h3>🧩 Event Type Distribution</h3>
+                        <span>Cowrie event categories</span>
+                    </div>
+
+                </div>
+
+                <canvas id="eventChart"></canvas>
+
+            </div>
+
+        </section>
+
+
+        <!-- SECOND ROW -->
+        <section class="dashboard-grid">
+
+            <!-- TOP SOURCE IP -->
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h3>🌐 Top Source IPs</h3>
+                        <span>Most active sources</span>
+                    </div>
+
+                </div>
+
+                <div class="ip-list" id="ipList"></div>
+
+            </div>
+
+
+            <!-- COMMAND ACTIVITY -->
+            <div class="panel large">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h3>💻 Recent Command Activity</h3>
+                        <span>Commands executed inside honeypot</span>
+                    </div>
+
+                    <span class="badge">LIVE</span>
+
+                </div>
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>TIME</th>
+                                <th>SOURCE IP</th>
+                                <th>COMMAND</th>
+                                <th>TECHNIQUE</th>
+                                <th>RISK</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="commandTable"></tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- THIRD ROW -->
+        <section class="dashboard-grid">
+
+            <!-- MITRE -->
+            <div class="panel large">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h3>🎯 MITRE ATT&CK Techniques</h3>
+                        <span>Detected attacker behavior</span>
+                    </div>
+
+                </div>
+
+                <div class="mitre-list" id="mitreList"></div>
+
+            </div>
+
+
+            <!-- SECURITY STATUS -->
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h3>🛡️ Security Status</h3>
+                        <span>System components</span>
+                    </div>
+
+                </div>
+
+                <div class="security-status">
+
+                    <div>
+                        <span class="status-dot"></span>
+                        <strong>Cowrie Honeypot</strong>
+                        <small>Running</small>
+                    </div>
+
+                    <div>
+                        <span class="status-dot"></span>
+                        <strong>Log Collection</strong>
+                        <small>Active</small>
+                    </div>
+
+                    <div>
+                        <span class="status-dot"></span>
+                        <strong>SIEM Monitoring</strong>
+                        <small>Active</small>
+                    </div>
+
+                    <div>
+                        <span class="status-dot"></span>
+                        <strong>Threat Detection</strong>
+                        <small>Operational</small>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- FOOTER -->
+
+        <footer>
+
+            <span>SSH Honeypot SIEM</span>
+
+            <span>
+                Cowrie • Splunk • MITRE ATT&CK
+            </span>
+
+        </footer>
+
+    </main>
+
+
+    <script src="script.js"></script>
+
+</body>
+</html>
